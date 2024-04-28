@@ -45,7 +45,7 @@
             <Font size="20.0" />
          </font>
       </TextField>
-      <TextArea fx:id="passwordTextArea" layoutX="273.0" layoutY="392.0" prefHeight="101.0" prefWidth="418.0" promptText="Password">
+      <TextArea fx:id="passwordTextArea" layoutX="273.0" layoutY="392.0" prefHeight="101.0" prefWidth="418.0" promptText="Password" wrapText="true">
          <font>
             <Font size="20.0" />
          </font>
@@ -74,7 +74,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button fx:id="editMasterPassButton" layoutX="38.0" layoutY="651.0" mnemonicParsing="false" prefHeight="44.0" prefWidth="219.0" text="Edit Master Password">
+      <Button fx:id="editMasterPassButton" layoutX="38.0" layoutY="651.0" mnemonicParsing="false" onAction="#editMasterPassword" prefHeight="44.0" prefWidth="219.0" text="Edit Master Password">
          <font>
             <Font size="20.0" />
          </font>
@@ -113,5 +113,13 @@
             <Font size="18.0" />
          </font>
       </Text>
+      <Button fx:id="cancelButton" layoutX="606.0" layoutY="651.0" mnemonicParsing="false" onAction="#cancelAddingCredentials" text="Cancel">
+         <font>
+            <Font size="20.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
    </children>
 </AnchorPane>

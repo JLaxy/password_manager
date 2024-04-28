@@ -67,6 +67,31 @@ public class JSONManager {
         }
     }
 
+    // Updates Master Password
+    public boolean updateMasterPassword(String password) {
+        try (Reader myReader = new BufferedReader(
+                new InputStreamReader(new FileInputStream(SETTINGS_PATH)))) {
+            // Creating builder
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            // Reading existing file
+            JsonObject root = gson.fromJson(myReader, JsonObject.class);
+            myReader.close();
+
+            Writer myWriter = new BufferedWriter(new FileWriter(SETTINGS_PATH));
+            JsonObject program_settings = root.getAsJsonObject("program_settings");
+
+            // Updating password
+            program_settings.addProperty("masterPassword", password);
+
+            gson.toJson(root, myWriter);
+            myWriter.close();
+            return true;
+        } catch (Exception e) {
+            PopupDialog.showErrorDialog(e, this.getClass().getName());
+        }
+        return false;
+    }
+
     // Returns a key-value pair which is used in JSON Files; number of arguments
     // must be even!
     private Map<String, Object> getJSONPair(Object... values) throws Exception {
@@ -143,6 +168,20 @@ public class JSONManager {
             PopupDialog.showErrorDialog(e, this.getClass().getName());
             return false;
         }
+    }
+
+    // Returns saved credentials
+    public JsonObject getSavedCredentials() {
+        try (Reader myReader = new BufferedReader(new InputStreamReader(new FileInputStream(SETTINGS_PATH)))) {
+            // Reading File
+            JsonObject myObject = JsonParser.parseReader(myReader).getAsJsonObject();
+            JsonObject credentials_list = myObject.getAsJsonObject("credentials_list");
+
+            return credentials_list;
+        } catch (Exception e) {
+            PopupDialog.showErrorDialog(e, this.getClass().getName());
+        }
+        return null;
     }
 
     // Returns true if password matches with Master Password

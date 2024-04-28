@@ -1,7 +1,8 @@
-import java.math.BigInteger;
-import java.util.Random;
+package helpers;
 
-class RSAManager {
+import java.math.BigInteger;
+
+public class RSAManager {
 
     // Keys
     private int p = 77, q = 41, e = 29, r, d, n;
@@ -109,11 +110,11 @@ class RSAManager {
         return BigInteger.valueOf(base).pow(power);
     }
 
-    public static void main(String[] args) {
-        RSAManager encryptor = new RSAManager();
-        String encrypted = encryptor.encryptMessage("I miss u Kix");
-        String decrypted = encryptor.decryptMessage(encrypted);
-        System.out.printf("Encrypted: %s\n", encrypted);
-        System.out.printf("Decrypted: %s\n", decrypted);
-    }
+    // public static void main(String[] args) {
+    // RSAManager encryptor = new RSAManager();
+    // String encrypted = encryptor.encryptMessage("I miss u Kix");
+    // String decrypted = encryptor.decryptMessage(encrypted);
+    // System.out.printf("Encrypted: %s\n", encrypted);
+    // System.out.printf("Decrypted: %s\n", decrypted);
+    // }
 }

@@ -5,7 +5,7 @@ package models;
  */
 
 public class Credential {
-    final String credentialLabel, username, password, dateCreated, lastModified;
+    public final String credentialLabel, username, password, dateCreated, lastModified;
 
     public Credential(String credentialLabel, String username, String password, String dateCreated,
             String lastModified) {
