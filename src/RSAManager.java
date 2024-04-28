@@ -5,11 +5,6 @@ class RSAManager {
     // Keys
     private int p = 77, q = 41, e = 29, r, d, n;
 
-    public RSAManager() {
-        // Checks if inputsa re valid
-        areInputsValid();
-    }
-
     // Returns True if number is prime
     private boolean isPrime(int number) {
         if (number <= 1)
@@ -68,6 +63,8 @@ class RSAManager {
     // Returns message encrypted in RSA
     public String encryptMessage(String message) {
         String encrpytedMessage = "";
+        // Removing any whitespace from message
+        message = message.replaceAll("\\s+", "");
 
         // Getting value of n
         this.n = p * q;
@@ -76,11 +73,6 @@ class RSAManager {
             // Getting ASCII value of character
             int asciiValue = (int) charac;
 
-            // Add space if space character
-            if (asciiValue == 32) {
-                encrpytedMessage += " ";
-                continue;
-            }
             // Calculated ciphered value then add to encrypted message, separated by dot
             encrpytedMessage += (raiseToPower(asciiValue, e).mod(BigInteger.valueOf(n))).intValue() + ".";
         }
@@ -99,25 +91,9 @@ class RSAManager {
         // Iterating through each character in message
         for (String encrypCharac : encryptedCharacters) {
             int asciiValue;
-            boolean hasSpaceBefore = false;
 
-            // Trying to catch number with space
-            try {
-                // Getting ASCII value of character
-                asciiValue = Integer.valueOf(encrypCharac);
-
-                // If has space before
-            } catch (Exception e) {
-                // Remove space
-                asciiValue = Integer.valueOf(encrypCharac.replace(" ", ""));
-                hasSpaceBefore = true;
-            }
-
-            // Add space if next character had space
-            if (hasSpaceBefore) {
-                decrpytedMessage += " " + (char) (raiseToPower(asciiValue, d).mod(BigInteger.valueOf(n))).intValue();
-                continue;
-            }
+            // Getting ASCII value of character
+            asciiValue = Integer.valueOf(encrypCharac);
 
             // Add to encrypted message
             decrpytedMessage += (char) (raiseToPower(asciiValue, d).mod(BigInteger.valueOf(n))).intValue();
@@ -134,7 +110,7 @@ class RSAManager {
 
     public static void main(String[] args) {
         RSAManager encryptor = new RSAManager();
-        String encrypted = encryptor.encryptMessage("I miss u kix");
+        String encrypted = encryptor.encryptMessage("I miss u Kix");
         String decrypted = encryptor.decryptMessage(encrypted);
         System.out.printf("Encrypted: %s\n", encrypted);
         System.out.printf("Decrypted: %s\n", decrypted);

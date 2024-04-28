@@ -1,37 +1,30 @@
+import java.io.IOException;
+
+import controllers.MainViewController;
+import helpers.JSONManager;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class PasswordManager extends Application {
 
     @Override
-    public void start(Stage primaryStage) {
-        Button btn = new Button();
-        btn.setText("Say 'Hello World'");
-        btn.setOnAction(new EventHandler<ActionEvent>() {
+    public void start(Stage mainStage) throws IOException {
+        // Intializing
+        JSONManager appDataManager = new JSONManager();
+        FXMLLoader rootLoader = new FXMLLoader(getClass().getResource("views/MainView.fxml"));
+        Parent root = rootLoader.load();
+        Scene scene = new Scene(root);
 
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("Hello World!");
-            }
-        });
+        // Retrieving controller
+        MainViewController controller = rootLoader.getController();
+        // Passing references
+        controller.initReferences(appDataManager);
 
-        StackPane root = new StackPane();
-        root.getChildren().add(btn);
-
-        /*
-         * Parent root = FXMLLoader.load(getClass().getResource("MainScene.fxml"));
-         * Scene scene = new Scene(root);
-         */
-
-        Scene scene = new Scene(root, 300, 250);
-
-        primaryStage.setTitle("Hello World!");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        mainStage.setTitle("Password Manager");
+        mainStage.setScene(scene);
+        mainStage.show();
     }
 }
