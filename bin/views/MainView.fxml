@@ -11,7 +11,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainViewController">
    <children>
-      <Button layoutX="734.0" layoutY="651.0" mnemonicParsing="false" text="Add Credential">
+      <Button fx:id="addButton" layoutX="734.0" layoutY="651.0" mnemonicParsing="false" onAction="#addCredentials" text="Add Credential">
          <font>
             <Font size="20.0" />
          </font>
@@ -19,7 +19,62 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button layoutX="902.0" layoutY="651.0" mnemonicParsing="false" text="Edit Credential">
+      <Button fx:id="editButton" layoutX="902.0" layoutY="651.0" mnemonicParsing="false" text="Edit Credential">
+         <font>
+            <Font size="20.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="deleteButton" layoutX="1065.0" layoutY="651.0" mnemonicParsing="false" text="Delete Credential">
+         <font>
+            <Font size="20.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <TextField fx:id="credentialTextField" layoutX="38.0" layoutY="271.0" prefHeight="44.0" prefWidth="653.0" promptText="Credential Label">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </TextField>
+      <TextField fx:id="userTextField" layoutX="38.0" layoutY="333.0" prefHeight="44.0" prefWidth="653.0" promptText="Username / Email">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </TextField>
+      <TextArea fx:id="passwordTextArea" layoutX="273.0" layoutY="392.0" prefHeight="101.0" prefWidth="418.0" promptText="Password">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </TextArea>
+      <Button fx:id="generateButton" layoutX="38.0" layoutY="392.0" mnemonicParsing="false" onAction="#generateRandomPassword" prefHeight="44.0" prefWidth="219.0" text="Generate Password">
+         <font>
+            <Font size="20.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="decryptButton" layoutX="38.0" layoutY="451.0" mnemonicParsing="false" prefHeight="44.0" prefWidth="219.0" text="Decrypt Password">
+         <font>
+            <Font size="20.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="saveButton" layoutX="38.0" layoutY="509.0" mnemonicParsing="false" onAction="#saveCredentials" prefHeight="44.0" prefWidth="219.0" text="Save">
+         <font>
+            <Font size="20.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="editMasterPassButton" layoutX="38.0" layoutY="651.0" mnemonicParsing="false" prefHeight="44.0" prefWidth="219.0" text="Edit Master Password">
          <font>
             <Font size="20.0" />
          </font>
@@ -32,82 +87,27 @@
             <Font size="49.0" />
          </font>
       </Text>
-      <ListView layoutX="733.0" layoutY="34.0" prefHeight="591.0" prefWidth="511.0" />
-      <Button layoutX="1065.0" layoutY="651.0" mnemonicParsing="false" text="Delete Credential">
-         <font>
-            <Font size="20.0" />
-         </font>
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
-      </Button>
-      <TextArea layoutX="273.0" layoutY="392.0" prefHeight="101.0" prefWidth="418.0" promptText="Password">
-         <font>
-            <Font size="20.0" />
-         </font>
-      </TextArea>
-      <TextField layoutX="38.0" layoutY="333.0" prefHeight="44.0" prefWidth="653.0" promptText="Username / Email">
-         <font>
-            <Font size="20.0" />
-         </font>
-      </TextField>
-      <TextField layoutX="38.0" layoutY="271.0" prefHeight="44.0" prefWidth="653.0" promptText="Credential Label">
-         <font>
-            <Font size="20.0" />
-         </font>
-      </TextField>
-      <Text layoutX="273.0" layoutY="523.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Date Created:">
+      <ListView fx:id="credentialListView" layoutX="733.0" layoutY="34.0" prefHeight="591.0" prefWidth="511.0" />
+      <Text fx:id="dateCreatedLabel" layoutX="273.0" layoutY="523.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Date Created:">
          <font>
             <Font size="20.0" />
          </font>
       </Text>
-      <Text layoutX="482.0" layoutY="523.0" strokeType="OUTSIDE" strokeWidth="0.0" text="April 27, 2024 | 5:43 PM" textAlignment="RIGHT">
+      <Text fx:id="dateCreatedValueLabel" layoutX="482.0" layoutY="523.0" strokeType="OUTSIDE" strokeWidth="0.0" text="April 27, 2024 | 5:43 PM" textAlignment="RIGHT">
          <font>
             <Font size="20.0" />
          </font>
       </Text>
-      <Text layoutX="273.0" layoutY="553.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Last Modified:">
+      <Text fx:id="lastModifiedLabel" layoutX="273.0" layoutY="553.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Last Modified:">
          <font>
             <Font size="20.0" />
          </font>
       </Text>
-      <Text layoutX="482.0" layoutY="553.0" strokeType="OUTSIDE" strokeWidth="0.0" text="April 27, 2024 | 5:43 PM" textAlignment="RIGHT">
+      <Text fx:id="lastModifiedValueLabel" layoutX="482.0" layoutY="553.0" strokeType="OUTSIDE" strokeWidth="0.0" text="April 27, 2024 | 5:43 PM" textAlignment="RIGHT">
          <font>
             <Font size="20.0" />
          </font>
       </Text>
-      <Button layoutX="38.0" layoutY="392.0" mnemonicParsing="false" prefHeight="44.0" prefWidth="219.0" text="Generate Password">
-         <font>
-            <Font size="20.0" />
-         </font>
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
-      </Button>
-      <Button layoutX="38.0" layoutY="451.0" mnemonicParsing="false" prefHeight="44.0" prefWidth="219.0" text="Decrypt Password">
-         <font>
-            <Font size="20.0" />
-         </font>
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
-      </Button>
-      <Button layoutX="38.0" layoutY="509.0" mnemonicParsing="false" prefHeight="44.0" prefWidth="219.0" text="Save">
-         <font>
-            <Font size="20.0" />
-         </font>
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
-      </Button>
-      <Button layoutX="38.0" layoutY="651.0" mnemonicParsing="false" prefHeight="44.0" prefWidth="219.0" text="Edit Master Password">
-         <font>
-            <Font size="20.0" />
-         </font>
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
-      </Button>
       <Text layoutX="336.0" layoutY="200.0" strokeType="OUTSIDE" strokeWidth="0.0" text="ver. 1.0">
          <font>
             <Font size="18.0" />

@@ -10,7 +10,8 @@ public class ProgramState {
     public enum State {
         // PROGRAM_STATE(state)
         EDIT_CREDENTIALS("editing"),
-        SELECTING_CREDENTIALS("selecting");
+        SELECTING_CREDENTIALS("selecting"),
+        ADDING_CREDENTIALS("adding");
 
         private final String programState;
 
