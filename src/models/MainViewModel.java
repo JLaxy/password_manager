@@ -80,13 +80,17 @@ public class MainViewModel {
         String encryptedPassword = encryptPassword(password);
 
         // If successfully saved
-        if (this.appDataManager.saveNewCredential(credentialLabel, username, encryptPassword(password))) {
+        if (this.appDataManager.saveNewCredential(credentialLabel, username, encryptPassword(password), null, null)) {
             // Add to list
             credentialsList.add(new Credential(credentialLabel, username, encryptedPassword,
                     DateHelper.getCurrentDateTimeString(), DateHelper.getCurrentDateTimeString()));
             return true;
         }
         return false;
+    }
+
+    public boolean editCredential(Credential oldCredential, Credential newCredential) {
+        return this.appDataManager.editCredential(oldCredential, newCredential);
     }
 
     public boolean deleteCredential(Credential credential) {
@@ -102,7 +106,7 @@ public class MainViewModel {
     }
 
     // Returns encrypted version of password
-    private String encryptPassword(String password) {
+    public String encryptPassword(String password) {
         return this.encryptionManager.encryptMessage(password);
     }
 

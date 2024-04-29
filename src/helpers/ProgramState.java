@@ -9,7 +9,7 @@ package helpers;
 public class ProgramState {
     public enum State {
         // PROGRAM_STATE(state)
-        EDIT_CREDENTIALS("editing"),
+        EDITING_CREDENTIALS("editing"),
         SELECTED_CREDENTIALS("selected"),
         SELECTING_CREDENTIALS("selecting"),
         ADDING_CREDENTIALS("adding");

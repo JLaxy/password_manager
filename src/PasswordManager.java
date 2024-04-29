@@ -2,9 +2,6 @@ import java.io.IOException;
 import controllers.MainViewController;
 import helpers.JSONManager;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

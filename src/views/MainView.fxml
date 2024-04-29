@@ -19,7 +19,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button fx:id="editButton" layoutX="902.0" layoutY="651.0" mnemonicParsing="false" text="Edit Credential">
+      <Button fx:id="editButton" layoutX="902.0" layoutY="651.0" mnemonicParsing="false" onAction="#editCredentials" text="Edit Credential">
          <font>
             <Font size="20.0" />
          </font>
@@ -113,7 +113,7 @@
             <Font size="18.0" />
          </font>
       </Text>
-      <Button fx:id="cancelButton" layoutX="606.0" layoutY="651.0" mnemonicParsing="false" onAction="#cancelAddingCredentials" text="Cancel">
+      <Button fx:id="cancelButton" layoutX="606.0" layoutY="651.0" mnemonicParsing="false" onAction="#cancelButton" text="Cancel">
          <font>
             <Font size="20.0" />
          </font>

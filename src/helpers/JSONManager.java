@@ -6,6 +6,7 @@ package helpers;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
@@ -18,6 +19,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import models.Credential;
 
 public class JSONManager {
 
@@ -47,17 +50,29 @@ public class JSONManager {
 
     // Creating settings file if it does not exist
     private void createAppdataFile() {
-        String masterPassword;
-        PopupDialog.showInfoDialog("No Appdata File", "Creating Appdata File for the first time");
-        try (Writer myWriter = new BufferedWriter(new FileWriter(SETTINGS_PATH))) {
-            // Retrieve Master Password
-            masterPassword = PopupDialog.getUserInput("Enter Master Password",
-                    "Please enter your new Master Password. \n\nNOTE THAT THIS CANNOT BE CHANGED ONCE YOU FORGET IT.")
-                    .replaceAll("\\s+", "");
+        String masterPassword = "";
 
-            // If null or empty, then exit program
-            if (masterPassword == null || masterPassword.isEmpty())
+        PopupDialog.showInfoDialog("No Appdata File", "Creating Appdata File for the first time");
+
+        try (Writer myWriter = new BufferedWriter(new FileWriter(SETTINGS_PATH))) {
+            // Test if Master Password is invalid
+            try {
+                // Retrieve Master Password
+                masterPassword = PopupDialog.getUserInput("Enter Master Password",
+                        "Please enter your new Master Password. Spaces will be removed. \n\nNOTE THAT THIS CANNOT BE CHANGED ONCE YOU FORGET IT.")
+                        .replaceAll("\\s+", "");
+
+                // If Master Password is empty
+                if (masterPassword.isEmpty())
+                    throw new Exception("Invalid Master Password");
+
+            } catch (Exception e) {
+                // Delete file then exit program
+                myWriter.close();
+                deleteAppFile();
+                PopupDialog.showCustomErrorDialog("Aborting operation");
                 System.exit(1);
+            }
 
             Map<String, Object> settingsFile = new HashMap<String, Object>();
 
@@ -69,6 +84,18 @@ public class JSONManager {
             new Gson().toJson(settingsFile, myWriter);
         } catch (Exception e) {
             PopupDialog.showErrorDialog(e, this.getClass().getName());
+        }
+    }
+
+    // Removes App Data file from system
+    private boolean deleteAppFile() {
+        System.out.println("deleting...");
+        try {
+            File appDataFile = new File(SETTINGS_PATH);
+            return appDataFile.delete();
+        } catch (Exception e) {
+            PopupDialog.showErrorDialog(e, this.getClass().getName());
+            return false;
         }
     }
 
@@ -141,7 +168,8 @@ public class JSONManager {
     }
 
     // Save New Credentials to Appdata File
-    public boolean saveNewCredential(String credentialLabel, String username, String password) {
+    public boolean saveNewCredential(String credentialLabel, String username, String password, String dateCreated,
+            String lastModified) {
         try (Reader myReader = new BufferedReader(
                 new InputStreamReader(new FileInputStream(SETTINGS_PATH)))) {
             // Creating builder
@@ -153,15 +181,18 @@ public class JSONManager {
             Writer myWriter = new BufferedWriter(new FileWriter(SETTINGS_PATH));
             JsonObject credentials_list = root.getAsJsonObject("credentials_list");
 
-            // Retrieving current date
-            String dateString = DateHelper.getCurrentDateTimeString();
+            // If no date supplied, then get current date
+            if (dateCreated == null) {
+                dateCreated = DateHelper.getCurrentDateTimeString();
+                lastModified = dateCreated;
+            }
 
             // Creating JSON object to be paired with Credential Label
             JsonObject credentials_info = new JsonObject();
             credentials_info.addProperty("username", username);
             credentials_info.addProperty("password", password);
-            credentials_info.addProperty("date_created", dateString);
-            credentials_info.addProperty("last_modified", dateString);
+            credentials_info.addProperty("date_created", dateCreated);
+            credentials_info.addProperty("last_modified", lastModified);
 
             // Adding to JSON Object
             credentials_list.add(credentialLabel, credentials_info);
@@ -175,6 +206,18 @@ public class JSONManager {
         }
     }
 
+    // Edits saved credentials
+    public boolean editCredential(Credential oldCredential, Credential newCredential) {
+        // Deleting old credential; return false if failed
+        if (!deleteCredential(oldCredential.credentialLabel))
+            return false;
+
+        // Saving new credential; return true if sucess
+        return saveNewCredential(newCredential.credentialLabel, newCredential.username, newCredential.password,
+                oldCredential.dateCreated, DateHelper.getCurrentDateTimeString());
+    }
+
+    // Delets saved credentials
     public boolean deleteCredential(String credentialLabel) {
         try (Reader myReader = new BufferedReader(
                 new InputStreamReader(new FileInputStream(SETTINGS_PATH)))) {

@@ -63,8 +63,10 @@ public class MainViewController {
             @Override
             public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
                 // Immediately return if selection was just unselected
-                if (credentialListView.getSelectionModel().getSelectedItem() == null)
+                if (credentialListView.getSelectionModel().getSelectedItem() == null) {
+                    selectedCredential = null;
                     return;
+                }
 
                 // Update State
                 programState = ProgramState.State.SELECTED_CREDENTIALS;
@@ -187,6 +189,32 @@ public class MainViewController {
                 this.lastModifiedValueLabel.setVisible(true);
                 break;
 
+            case ProgramState.State.EDITING_CREDENTIALS:
+                // Disabling Buttons
+                this.addButton.setDisable(true);
+                this.decryptButton.setDisable(true);
+                this.editButton.setDisable(true);
+                this.deleteButton.setDisable(true);
+                // Enabling Buttons
+                this.generateButton.setDisable(false);
+                this.cancelButton.setDisable(false);
+                this.saveButton.setDisable(false);
+                // Enabling Fields
+                this.credentialTextField.setDisable(false);
+                this.credentialTextField.setEditable(true);
+                this.userTextField.setDisable(false);
+                this.userTextField.setEditable(true);
+                this.passwordTextArea.setDisable(false);
+                this.passwordTextArea.setEditable(true);
+                // Hiding Labels
+                this.dateCreatedLabel.setVisible(false);
+                this.dateCreatedValueLabel.setVisible(false);
+                this.lastModifiedLabel.setVisible(false);
+                this.lastModifiedValueLabel.setVisible(false);
+                // Disabling list view
+                credentialListView.setDisable(true);
+                break;
+
             default:
                 break;
         }
@@ -212,13 +240,15 @@ public class MainViewController {
 
     // Sets state to adding credentials
     public void addCredentials() {
-        System.out.println("adding credentials...");
-        this.programState = ProgramState.State.ADDING_CREDENTIALS;
-        syncElementStates();
+        if (isMasterPasswordVerified()) {
+            System.out.println("adding credentials...");
+            this.programState = ProgramState.State.ADDING_CREDENTIALS;
+            syncElementStates();
+        }
     }
 
     // Sets state back to selecting credentials
-    public void cancelAddingCredentials() {
+    public void cancelButton() {
         // Clear Text Fields
         clearFields();
         // Update State
@@ -236,14 +266,15 @@ public class MainViewController {
             PopupDialog.showCustomErrorDialog("Please fill out all fields!");
             return;
         }
-        // Checks if Credential Label is unique
-        if (model.doesCredentialLabelExist(this.credentialTextField.getText())) {
-            PopupDialog.showCustomErrorDialog("That credential label already exists!");
-            return;
-        }
 
-        // Check if password matches master password
-        if (isMasterPasswordVerified()) {
+        // If adding new credential
+        if (this.selectedCredential == null) {
+            // Checks if Credential Label is unique
+            if (model.doesCredentialLabelExist(this.credentialTextField.getText())) {
+                PopupDialog.showCustomErrorDialog("That credential label already exists!");
+                return;
+            }
+
             // Save New Credentials
             if (this.model.saveNewCredential(this.credentialTextField.getText(), this.userTextField.getText(),
                     this.passwordTextArea.getText().replaceAll("\\s+", ""))) {
@@ -256,10 +287,33 @@ public class MainViewController {
                 // Update Program state
                 this.programState = ProgramState.State.SELECTING_CREDENTIALS;
                 syncElementStates();
-            } else
-                PopupDialog.showCustomErrorDialog("Failed to save new credentials!");
+                return;
+            }
+            // Editing new credentials
+            // If sucessfully edited credential
+        } else if (this.model.editCredential(this.selectedCredential, new Credential(this.credentialTextField.getText(),
+                this.userTextField.getText(), this.model.encryptPassword(this.passwordTextArea.getText()), null,
+                null))) {
+            PopupDialog.showInfoDialog("Updated Credential", "Sucessfully edited credential!");
+            // Clear fields
+            clearFields();
+            // Refresh list view
+            initListView();
+            // Update program state
+            this.programState = ProgramState.State.SELECTING_CREDENTIALS;
+            syncElementStates();
+            return;
         }
+        PopupDialog.showCustomErrorDialog("Failed to save new credentials!");
+    }
 
+    // Edit selected credentials
+    public void editCredentials() {
+        if (isMasterPasswordVerified()) {
+            this.passwordTextArea.setText(this.model.decryptPassword(this.passwordTextArea.getText()));
+            this.programState = ProgramState.State.EDITING_CREDENTIALS;
+            syncElementStates();
+        }
     }
 
     // Delete credential from saved data
@@ -289,6 +343,7 @@ public class MainViewController {
         if (isMasterPasswordVerified()) {
             // Disabling button
             this.decryptButton.setDisable(true);
+            this.editButton.setDisable(true);
             // Retrieving decrypted password from model
             String decryptedPassword = this.model.decryptPassword(passwordTextArea.getText());
             // Setting decrypting password in password text area
