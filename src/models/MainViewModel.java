@@ -7,6 +7,7 @@ import java.util.Random;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import helpers.DateHelper;
 import helpers.JSONManager;
 import helpers.RSAManager;
 
@@ -76,7 +77,20 @@ public class MainViewModel {
 
     // Tells JSONManager to save new credential
     public boolean saveNewCredential(String credentialLabel, String username, String password) {
-        return this.appDataManager.saveNewCredential(credentialLabel, username, encryptPassword(password));
+        String encryptedPassword = encryptPassword(password);
+
+        // If successfully saved
+        if (this.appDataManager.saveNewCredential(credentialLabel, username, encryptPassword(password))) {
+            // Add to list
+            credentialsList.add(new Credential(credentialLabel, username, encryptedPassword,
+                    DateHelper.getCurrentDateTimeString(), DateHelper.getCurrentDateTimeString()));
+            return true;
+        }
+        return false;
+    }
+
+    public boolean deleteCredential(Credential credential) {
+        return this.appDataManager.deleteCredential(credential.credentialLabel);
     }
 
     // Returns True if password matches master password
@@ -92,6 +106,12 @@ public class MainViewModel {
         return this.encryptionManager.encryptMessage(password);
     }
 
+    // Returns decrypted password from RSA Manager
+    public String decryptPassword(String password) {
+        return this.encryptionManager.decryptMessage(password);
+    }
+
+    // Returns true if successfully updated master password
     public boolean updateMasterPassword(String password) {
         return this.appDataManager.updateMasterPassword(password);
     }

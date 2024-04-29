@@ -19,15 +19,16 @@ public class RSAManager {
         return true;
     }
 
+    // DEBUG FUNCTION
     // Returns true if all inputs are valid
     private boolean areInputsValid() {
         try {
             // Verify if P and Q are valid
-            if (!(isPrime(p) && isPrime(q) && isPrime(e)))
+            if (!(isPrime(this.p) && isPrime(this.q) && isPrime(this.e)))
                 throw new Exception("P, Q and E are not prime");
-            else if (p * q < e)
+            else if (this.p * this.q < this.e)
                 throw new Exception("E should not be larger than (P*Q)");
-            else if (areCoPrime(e, n))
+            else if (areCoPrime(this.e, this.n))
                 throw new Exception("E is not coprime with other number");
         } catch (Exception e) {
             System.out.println(e);
@@ -51,15 +52,15 @@ public class RSAManager {
 
     // Calcualtes private key
     private int getPrivateKey() {
-        this.r = (p - 1) * (q - 1);
+        this.r = (this.p - 1) * (this.q - 1);
         this.d = 0;
         while (true) {
-            if ((e * d) % r == 1)
+            if ((this.e * this.d) % r == 1)
                 break;
-            ++d;
+            ++this.d;
         }
 
-        return d;
+        return this.d;
     }
 
     // Returns message encrypted in RSA
@@ -69,14 +70,14 @@ public class RSAManager {
         message = message.replaceAll("\\s+", "");
 
         // Getting value of n
-        this.n = p * q;
+        this.n = this.p * this.q;
         // Iterating through each character in message
         for (char charac : message.toCharArray()) {
             // Getting ASCII value of character
             int asciiValue = (int) charac;
 
             // Calculated ciphered value then add to encrypted message, separated by dot
-            encrpytedMessage += (raiseToPower(asciiValue, e).mod(BigInteger.valueOf(n))).intValue() + ".";
+            encrpytedMessage += (raiseToPower(asciiValue, this.e).mod(BigInteger.valueOf(this.n))).intValue() + ".";
         }
         // Return encrypted message
         return encrpytedMessage;
@@ -84,6 +85,9 @@ public class RSAManager {
 
     // Returns message encrypted in RSA
     public String decryptMessage(String message) {
+        // Getting value of n if not yet
+        this.n = this.p * this.q;
+
         // Turning message into array
         String[] encryptedCharacters = message.split("\\.");
         // Calculating private key
@@ -98,7 +102,7 @@ public class RSAManager {
             asciiValue = Integer.valueOf(encrypCharac);
 
             // Add to encrypted message
-            decrpytedMessage += (char) (raiseToPower(asciiValue, d).mod(BigInteger.valueOf(n))).intValue();
+            decrpytedMessage += (char) (raiseToPower(asciiValue, this.d).mod(BigInteger.valueOf(this.n))).intValue();
         }
 
         // Return encrypted message
@@ -113,7 +117,8 @@ public class RSAManager {
     // public static void main(String[] args) {
     // RSAManager encryptor = new RSAManager();
     // String encrypted = encryptor.encryptMessage("I miss u Kix");
-    // String decrypted = encryptor.decryptMessage(encrypted);
+    // String decrypted = encryptor
+    // .decryptMessage("219.1651.1606.1307.464.2987.1180.576.1823.1307.189.1651.1606.");
     // System.out.printf("Encrypted: %s\n", encrypted);
     // System.out.printf("Decrypted: %s\n", decrypted);
     // }

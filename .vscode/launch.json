@@ -6,6 +6,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "RSAManager",
+      "request": "launch",
+      "mainClass": "helpers.RSAManager",
+      "projectName": "password_manager_f8d56f48"
+    },
+    {
+      "type": "java",
       "name": "Runner",
       "request": "launch",
       "mainClass": "Runner",

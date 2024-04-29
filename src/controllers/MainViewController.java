@@ -16,15 +16,22 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.text.Text;
 import models.Credential;
 import models.MainViewModel;
 
 public class MainViewController {
+    // Instances of clipboard; allows to automatically copy password to clipboard
+    private Clipboard clipboard = Clipboard.getSystemClipboard();
+    private ClipboardContent clipboardContent = new ClipboardContent();
+
     // Initial state
     private ProgramState.State programState = ProgramState.State.SELECTING_CREDENTIALS;
-    // Model
+
     private MainViewModel model;
+    private Credential selectedCredential;
 
     // Injecting FXML elements
     @FXML
@@ -51,10 +58,11 @@ public class MainViewController {
         // Syncing elements to program state
         syncElementStates();
 
-        // Function triggered when selecting on list view
+        // Defining function triggered when selecting on list view
         credentialListView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
+                // Immediately return if selection was just unselected
                 if (credentialListView.getSelectionModel().getSelectedItem() == null)
                     return;
 
@@ -72,6 +80,8 @@ public class MainViewController {
                         passwordTextArea.setText(credential.password);
                         dateCreatedValueLabel.setText(credential.dateCreated);
                         lastModifiedValueLabel.setText(credential.lastModified);
+                        // Setting current credential as selected credential
+                        selectedCredential = credential;
                         break;
                     }
                 }
@@ -83,14 +93,14 @@ public class MainViewController {
     // Syncing references
     public void initReferences(JSONManager appDataManager) {
         this.model.setAppDataManager(appDataManager);
-        // TODO: Initialize List View
         initListView();
     }
 
     // Initilizes List View and Loads Data
     private void initListView() {
         ArrayList<Credential> credentialsList = this.model.initializeCredentials();
-
+        // Clearing list view
+        credentialListView.getItems().clear();
         // Iterating through each credential in list
         for (Credential credential : credentialsList) {
             credentialListView.getItems().add(credential.credentialLabel);
@@ -144,6 +154,11 @@ public class MainViewController {
                 this.addButton.setDisable(true);
                 this.editButton.setDisable(true);
                 this.deleteButton.setDisable(true);
+                // Hiding Labels
+                this.dateCreatedLabel.setVisible(false);
+                this.dateCreatedValueLabel.setVisible(false);
+                this.lastModifiedLabel.setVisible(false);
+                this.lastModifiedValueLabel.setVisible(false);
                 // Enabling
                 credentialListView.setDisable(true);
                 break;
@@ -165,6 +180,11 @@ public class MainViewController {
                 this.userTextField.setEditable(false);
                 this.passwordTextArea.setDisable(false);
                 this.passwordTextArea.setEditable(false);
+                // Showing Labels
+                this.dateCreatedLabel.setVisible(true);
+                this.dateCreatedValueLabel.setVisible(true);
+                this.lastModifiedLabel.setVisible(true);
+                this.lastModifiedValueLabel.setVisible(true);
                 break;
 
             default:
@@ -227,16 +247,58 @@ public class MainViewController {
             // Save New Credentials
             if (this.model.saveNewCredential(this.credentialTextField.getText(), this.userTextField.getText(),
                     this.passwordTextArea.getText().replaceAll("\\s+", ""))) {
+                // Refreshing list view
+                initListView();
                 // Show success dialog
                 PopupDialog.showInfoDialog("Success!", "New credentials saved successfully");
                 // Clear Text Fields
                 clearFields();
                 // Update Program state
                 this.programState = ProgramState.State.SELECTING_CREDENTIALS;
+                syncElementStates();
             } else
                 PopupDialog.showCustomErrorDialog("Failed to save new credentials!");
         }
 
+    }
+
+    // Delete credential from saved data
+    public void deleteCredentials() {
+        // If supplied password is correct
+        if (isMasterPasswordVerified()) {
+            if (this.model.deleteCredential(this.selectedCredential)) {
+                // Show success message
+                PopupDialog.showInfoDialog("Success!", "Successfully removed credential");
+                // Update list view
+                initListView();
+                // Clearing fields
+                clearFields();
+                // Updating state
+                this.programState = ProgramState.State.SELECTING_CREDENTIALS;
+                syncElementStates();
+                return;
+            }
+            // Else
+            PopupDialog.showCustomErrorDialog("Failed to remove credential");
+        }
+    }
+
+    // Decrypts password of selected credential
+    public void decryptPassword() {
+        // If supplied password is correct
+        if (isMasterPasswordVerified()) {
+            // Disabling button
+            this.decryptButton.setDisable(true);
+            // Retrieving decrypted password from model
+            String decryptedPassword = this.model.decryptPassword(passwordTextArea.getText());
+            // Setting decrypting password in password text area
+            passwordTextArea.setText(decryptedPassword);
+            // Adding decrypted password to clipboard
+            this.clipboardContent.putString(decryptedPassword);
+            this.clipboard.setContent(clipboardContent);
+            // Inform user
+            PopupDialog.showInfoDialog("Added to Clipboard", "Decrypted password has been copied to your clipboard!");
+        }
     }
 
     // Edits master passsword
@@ -246,8 +308,10 @@ public class MainViewController {
             String newPassword = PopupDialog.getUserInput("New Master Password", "Enter New Master Password");
 
             // Cancels operation if user left dialog box blank
-            if (newPassword == null)
+            if (newPassword == null || newPassword.isEmpty()) {
+                PopupDialog.showCustomErrorDialog("Failed to update Master Password!");
                 return;
+            }
 
             if (this.model.updateMasterPassword(newPassword))
                 PopupDialog.showInfoDialog("Master Password Updated", "Successfully updated Master Password!");

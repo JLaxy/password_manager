@@ -27,7 +27,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button fx:id="deleteButton" layoutX="1065.0" layoutY="651.0" mnemonicParsing="false" text="Delete Credential">
+      <Button fx:id="deleteButton" layoutX="1065.0" layoutY="651.0" mnemonicParsing="false" onAction="#deleteCredentials" text="Delete Credential">
          <font>
             <Font size="20.0" />
          </font>
@@ -58,7 +58,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button fx:id="decryptButton" layoutX="38.0" layoutY="451.0" mnemonicParsing="false" prefHeight="44.0" prefWidth="219.0" text="Decrypt Password">
+      <Button fx:id="decryptButton" layoutX="38.0" layoutY="451.0" mnemonicParsing="false" onAction="#decryptPassword" prefHeight="44.0" prefWidth="219.0" text="Decrypt Password">
          <font>
             <Font size="20.0" />
          </font>

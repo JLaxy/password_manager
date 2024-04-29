@@ -55,12 +55,17 @@ public class JSONManager {
                     "Please enter your new Master Password. \n\nNOTE THAT THIS CANNOT BE CHANGED ONCE YOU FORGET IT.")
                     .replaceAll("\\s+", "");
 
-            // If null, then exit program
-            if (masterPassword == null)
+            // If null or empty, then exit program
+            if (masterPassword == null || masterPassword.isEmpty())
                 System.exit(1);
 
             Map<String, Object> settingsFile = new HashMap<String, Object>();
+
+            // For Master Password
             settingsFile.put("program_settings", getJSONPair("masterPassword", masterPassword));
+            // For Credentials List
+            settingsFile.put("credentials_list", new HashMap<String, Object>());
+
             new Gson().toJson(settingsFile, myWriter);
         } catch (Exception e) {
             PopupDialog.showErrorDialog(e, this.getClass().getName());
@@ -160,6 +165,33 @@ public class JSONManager {
 
             // Adding to JSON Object
             credentials_list.add(credentialLabel, credentials_info);
+
+            gson.toJson(root, myWriter);
+            myWriter.close();
+            return true;
+        } catch (Exception e) {
+            PopupDialog.showErrorDialog(e, this.getClass().getName());
+            return false;
+        }
+    }
+
+    public boolean deleteCredential(String credentialLabel) {
+        try (Reader myReader = new BufferedReader(
+                new InputStreamReader(new FileInputStream(SETTINGS_PATH)))) {
+            // Creating builder
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            // Reading existing file
+            JsonObject root = gson.fromJson(myReader, JsonObject.class);
+            myReader.close();
+
+            Writer myWriter = new BufferedWriter(new FileWriter(SETTINGS_PATH));
+            JsonObject credentials_list = root.getAsJsonObject("credentials_list");
+
+            // If failed to remove
+            if (credentials_list.remove(credentialLabel) == null) {
+                myWriter.close();
+                return false;
+            }
 
             gson.toJson(root, myWriter);
             myWriter.close();
